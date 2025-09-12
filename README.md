@@ -23,10 +23,8 @@ This repository hosts my collection of n8n workflows and supporting assets. I us
 
 #### Example workflows
 
-- Webhook → Transform JSON → Post to Chat
-- Cron → Google Sheets → Email summary
-- Webhook → OpenAI → Notion page creation
-- RSS → Filter → Telegram broadcast
+- RAG Chatbot
+- Customer Support Workflow
 
 #### Getting started
 
@@ -39,14 +37,6 @@ Helpful docs:
 - n8n docs: https://docs.n8n.io
 - Credentials guide: https://docs.n8n.io/credentials/
 - Workflows import/export: https://docs.n8n.io/workflows/export-import/
-
-#### Folder structure
-
-- workflows/ — main n8n workflow JSON files
-- subworkflows/ — smaller reusable flows (Execute Workflow)
-- templates/ — starter patterns and blueprints
-- docs/ — notes, setup guides, and references
-- assets/ — images, diagrams (e.g., n8n.png)
 
 #### Contributing
 
