@@ -1,0 +1,344 @@
+{
+  "name": "Project5_LinkedIn_Content_Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## LinkedIn Content Creator Workflow\n**We must use Schedule trigger in active mode**\n** But here we use manual trigger to test ** ",
+        "height": 96,
+        "width": 544
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "ab3c8531-2c7d-4552-b248-8d9cd28017e0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -64
+      ],
+      "id": "081e58c0-a9fd-40b9-a4b0-b118444cf279",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        128
+      ],
+      "id": "9aace7be-8a38-47d6-b973-d594c320da39",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oBEHQXIQ_4Mc0gUXHoqwOUx_3dg0TjrmDsG0pDE2llo",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oBEHQXIQ_4Mc0gUXHoqwOUx_3dg0TjrmDsG0pDE2llo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oBEHQXIQ_4Mc0gUXHoqwOUx_3dg0TjrmDsG0pDE2llo/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "To DO"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -240,
+        128
+      ],
+      "id": "c862a3c0-16cc-434c-b3dd-f8e41b9c9b60",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HrOw11Ckw1Z661KD",
+          "name": "Google Sheets Sep 2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"Search in the web for most up-to-date information related to {{ $json.Topic }} and list these news with reference link for me\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -32,
+        128
+      ],
+      "id": "cbd9ba55-bf3a-48cf-ae39-47ce11b0f94b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article: {{ $json.results[0].content }}",
+        "options": {
+          "systemMessage": "=You are a professional copywriter specializing in LinkedIn content.\nThe user provided an article as input: {{ $json.results[0].content }}.\nYour task is to create a single LinkedIn post that:\n\nOrganized & Professional: Flows logically with clear structure and a polished, business-appropriate tone.\n\nConcise: Around 150–300 words (or less if the article’s content allows).\n\nRelevant: Focuses only on the key insights and takeaways that matter to a LinkedIn audience (professionals, industry peers, decision makers).\n\nAction-Oriented: Include an engaging hook at the start and a call to action or thought-provoking question at the end to drive conversation.\n\nNo fluff or repetition. Avoid hashtags unless they add specific value.\n\nOutput only the finished LinkedIn post—no extra commentary or explanations with enough relevand # at the end."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        128
+      ],
+      "id": "9cf3e22e-ae58-4d44-8e91-db849ec3553f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        336
+      ],
+      "id": "7f628630-01cb-47aa-9ada-dd67051e16c6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "NyXs5z92Vcn4wgME",
+          "name": "OpenAI_Sep2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1oBEHQXIQ_4Mc0gUXHoqwOUx_3dg0TjrmDsG0pDE2llo",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oBEHQXIQ_4Mc0gUXHoqwOUx_3dg0TjrmDsG0pDE2llo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oBEHQXIQ_4Mc0gUXHoqwOUx_3dg0TjrmDsG0pDE2llo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get row(s) in sheet').item.json.Topic }}",
+            "Status": "Created",
+            "Content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        128
+      ],
+      "id": "c2b43db8-fb19-493d-bac5-f29a32d477d4",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HrOw11Ckw1Z661KD",
+          "name": "Google Sheets Sep 2025"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c2ea427c-5e38-47c4-9a99-5b8e0dd1ebde",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f1cddd5f9367739fdac6f3daa9dfcf02c2f537ed1b3cc5b55d79e1bb32a867f7"
+  },
+  "id": "XrLtpXAjfmCPXpCD",
+  "tags": [
+    {
+      "createdAt": "2025-09-12T12:44:20.250Z",
+      "updatedAt": "2025-09-12T12:44:20.250Z",
+      "id": "HszcS87nsgRrS4ct",
+      "name": "Content Creator"
+    },
+    {
+      "createdAt": "2025-09-12T12:44:11.364Z",
+      "updatedAt": "2025-09-12T12:44:11.364Z",
+      "id": "Ol0OO7tqvKKTONkV",
+      "name": "LinkedIn"
+    },
+    {
+      "createdAt": "2025-09-13T10:44:41.755Z",
+      "updatedAt": "2025-09-13T10:44:41.755Z",
+      "id": "kGDX7Musw07rG1oU",
+      "name": "google sheet"
+    },
+    {
+      "createdAt": "2025-09-13T10:44:45.077Z",
+      "updatedAt": "2025-09-13T10:44:45.077Z",
+      "id": "ybGzAXiYURxOdb5K",
+      "name": "tavali"
+    }
+  ]
+}
